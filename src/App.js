@@ -1,39 +1,52 @@
 import React, { useState } from "react";
-import { Utensils } from "lucide-react"; // Ícono genérico
+import {
+  CupSoda,
+  Coffee,
+  GlassWater,
+  CookingPot,
+  Plus,
+  Minus,
+} from "lucide-react";
 
-// Productos agrupados por categoría
+// Iconos personalizados con Emojis
+const TacoIcon = ({ size = 22 }) => (
+  <span style={{ fontSize: `${size}px` }}>🌮</span>
+);
+const PanIcon = ({ size = 22 }) => (
+  <span style={{ fontSize: `${size}px` }}>🍞</span>
+);
+
 const categorias = {
   Tacos: [
-    { nombre: "Cecina", precio: 30, icono: Utensils },
-    { nombre: "Aguja de Res", precio: 30, icono: Utensils },
-    { nombre: "Campechano", precio: 30, icono: Utensils },
-    { nombre: "Guisado", precio: 27, icono: Utensils },
-    { nombre: "Pechuga de Pollo", precio: 27, icono: Utensils },
-    { nombre: "Longaniza", precio: 27, icono: Utensils },
-    { nombre: "Bistek", precio: 27, icono: Utensils },
+    { nombre: "Cecina", precio: 30, icono: TacoIcon },
+    { nombre: "Aguja de Res", precio: 30, icono: TacoIcon },
+    { nombre: "Campechano", precio: 30, icono: TacoIcon },
+    { nombre: "Guisado", precio: 27, icono: TacoIcon },
+    { nombre: "Pechuga de Pollo", precio: 27, icono: TacoIcon },
+    { nombre: "Longaniza", precio: 27, icono: TacoIcon },
+    { nombre: "Bistek", precio: 27, icono: TacoIcon },
   ],
   Comida: [
-    { nombre: "Guisado en plato", precio: 65, icono: Utensils },
-    { nombre: "Caldo", precio: 90, icono: Utensils },
+    { nombre: "Guisado en plato", precio: 65, icono: CookingPot },
+    { nombre: "Caldo", precio: 90, icono: CookingPot },
   ],
   Bebidas: [
-    { nombre: "Refresco", precio: 27, icono: Utensils },
-    { nombre: "Café", precio: 17, icono: Utensils },
-    { nombre: "Atole", precio: 17, icono: Utensils },
-    { nombre: "Agua Sabor 1L", precio: 32, icono: Utensils },
-    { nombre: "Agua Sabor 1/2L", precio: 17, icono: Utensils },
-    { nombre: "Agua Natural 1L", precio: 17, icono: Utensils },
-    { nombre: "Agua Natural 1/2L", precio: 10, icono: Utensils },
+    { nombre: "Refresco", precio: 27, icono: CupSoda },
+    { nombre: "Café", precio: 17, icono: Coffee },
+    { nombre: "Atole", precio: 17, icono: Coffee },
+    { nombre: "Agua Sabor 1L", precio: 32, icono: GlassWater },
+    { nombre: "Agua Sabor 1/2L", precio: 17, icono: GlassWater },
+    { nombre: "Agua Natural 1L", precio: 17, icono: GlassWater },
+    { nombre: "Agua Natural 1/2L", precio: 10, icono: GlassWater },
   ],
-  Extra: [{ nombre: "Pan", precio: 17, icono: Utensils }],
+  Extra: [{ nombre: "Pan", precio: 17, icono: PanIcon }],
 };
 
-// Colores de fondo para cada categoría
 const colores = {
-  Tacos: "#ffe5e5", // rojo suave
-  Comida: "#fff3cd", // amarillo suave
-  Bebidas: "#d4edda", // verde suave
-  Extra: "#d1ecf1", // azul suave
+  Tacos: "#ffe5e5",
+  Comida: "#fff3cd",
+  Bebidas: "#d4edda",
+  Extra: "#d1ecf1",
 };
 
 export default function POSApp() {
@@ -51,6 +64,27 @@ export default function POSApp() {
     setTotal((prev) => prev + producto.precio);
   };
 
+  const quitarProducto = (producto) => {
+    if (!cuenta[producto.nombre]) return;
+
+    setCuenta((prev) => {
+      const nuevaCantidad = prev[producto.nombre].cantidad - 1;
+      if (nuevaCantidad <= 0) {
+        const nuevaCuenta = { ...prev };
+        delete nuevaCuenta[producto.nombre];
+        return nuevaCuenta;
+      }
+      return {
+        ...prev,
+        [producto.nombre]: {
+          ...prev[producto.nombre],
+          cantidad: nuevaCantidad,
+        },
+      };
+    });
+    setTotal((prev) => prev - producto.precio);
+  };
+
   const resetCuenta = () => {
     setCuenta({});
     setTotal(0);
@@ -61,7 +95,7 @@ export default function POSApp() {
       style={{
         minHeight: "100vh",
         backgroundColor: "#f3f4f6",
-        fontFamily: "'Segoe UI', Arial, sans-serif",
+        fontFamily: "sans-serif",
       }}
     >
       {/* Header fijo */}
@@ -74,15 +108,7 @@ export default function POSApp() {
           zIndex: 1000,
         }}
       >
-        <h1
-          style={{
-            textAlign: "center",
-            fontWeight: "bold",
-            fontSize: "28px",
-            marginBottom: "10px",
-            color: "#2c3e50",
-          }}
-        >
+        <h1 style={{ textAlign: "center", color: "#2c3e50" }}>
           Sabor a Oaxaca
         </h1>
         <div
@@ -92,7 +118,7 @@ export default function POSApp() {
             alignItems: "center",
             backgroundColor: "#1f2937",
             color: "white",
-            padding: "12px 16px",
+            padding: "12px",
             borderRadius: "10px",
           }}
         >
@@ -103,92 +129,121 @@ export default function POSApp() {
             onClick={resetCuenta}
             style={{
               backgroundColor: "#e74c3c",
-              padding: "10px 16px",
-              borderRadius: "10px",
-              fontWeight: "bold",
-              fontSize: "16px",
               color: "white",
+              padding: "10px",
+              borderRadius: "10px",
               border: "none",
-              cursor: "pointer",
+              fontWeight: "bold",
             }}
           >
-            Limpiar Cuenta
+            Limpiar
           </button>
         </div>
       </div>
 
-      {/* Contenido scrollable */}
+      {/* Productos */}
       <div style={{ padding: "15px" }}>
         {Object.keys(categorias).map((cat) => (
           <div
             key={cat}
             style={{
-              marginBottom: "25px",
+              marginBottom: "20px",
               backgroundColor: colores[cat],
               padding: "15px",
               borderRadius: "12px",
-              boxShadow: "0 3px 6px rgba(0,0,0,0.1)",
             }}
           >
-            <h2
-              style={{
-                fontWeight: "bold",
-                fontSize: "22px",
-                marginBottom: "12px",
-                color: "#34495e",
-              }}
-            >
-              {cat}
-            </h2>
+            <h2 style={{ fontSize: "20px", marginBottom: "10px" }}>{cat}</h2>
             <div
-              style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
             >
               {categorias[cat].map((p) => {
                 const Icono = p.icono;
+                const cantidad = cuenta[p.nombre]?.cantidad || 0;
                 return (
-                  <button
+                  <div
                     key={p.nombre}
-                    onClick={() => agregarProducto(p)}
                     style={{
                       display: "flex",
-                      justifyContent: "space-between",
                       alignItems: "center",
                       backgroundColor: "white",
                       borderRadius: "10px",
-                      padding: "18px",
-                      textAlign: "left",
-                      boxShadow: "0 3px 6px rgba(0,0,0,0.1)",
-                      fontSize: "18px",
-                      cursor: "pointer",
+                      padding: "10px",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                     }}
                   >
-                    <div
+                    {/* Botón de Menos */}
+                    <button
+                      onClick={() => quitarProducto(p)}
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
+                        border: "none",
+                        backgroundColor: cantidad > 0 ? "#ffeded" : "#f5f5f5",
+                        color: "#e74c3c",
+                        padding: "10px",
+                        borderRadius: "8px",
+                        cursor: "pointer",
                       }}
                     >
-                      <Icono size={22} />
-                      <span style={{ fontWeight: "600" }}>{p.nombre}</span>
-                    </div>
-                    <div style={{ fontSize: "16px" }}>
-                      <span style={{ color: "green", fontWeight: "bold" }}>
-                        ${p.precio}
-                      </span>
-                      {cuenta[p.nombre] && (
+                      <Minus size={20} />
+                    </button>
+
+                    {/* Info del Producto (Click aquí también agrega) */}
+                    <div
+                      onClick={() => agregarProducto(p)}
+                      style={{
+                        flex: 1,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        padding: "0 15px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                        }}
+                      >
+                        <Icono size={22} />
+                        <div>
+                          <div style={{ fontWeight: "600" }}>{p.nombre}</div>
+                          <div style={{ color: "green", fontSize: "14px" }}>
+                            ${p.precio}
+                          </div>
+                        </div>
+                      </div>
+                      {cantidad > 0 && (
                         <span
                           style={{
-                            color: "#3498db",
-                            marginLeft: "10px",
+                            backgroundColor: "#3498db",
+                            color: "white",
+                            padding: "2px 8px",
+                            borderRadius: "12px",
                             fontWeight: "bold",
                           }}
                         >
-                          x{cuenta[p.nombre].cantidad}
+                          {cantidad}
                         </span>
                       )}
                     </div>
-                  </button>
+
+                    {/* Botón de Más */}
+                    <button
+                      onClick={() => agregarProducto(p)}
+                      style={{
+                        border: "none",
+                        backgroundColor: "#e8f4fd",
+                        color: "#3498db",
+                        padding: "10px",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <Plus size={20} />
+                    </button>
+                  </div>
                 );
               })}
             </div>
