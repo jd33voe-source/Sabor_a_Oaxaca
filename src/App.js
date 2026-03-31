@@ -61,7 +61,6 @@ export default function POSApp() {
   const [mostrarQR, setMostrarQR] = useState(false);
   const [verHistorial, setVerHistorial] = useState(false);
 
-  // Cargar historial desde la memoria del teléfono
   const [historial, setHistorial] = useState(() => {
     const guardado = localStorage.getItem("ventas_oaxaca");
     return guardado ? JSON.parse(guardado) : [];
@@ -110,12 +109,9 @@ export default function POSApp() {
         .join(", "),
       monto: total,
     };
-
     const nuevoHistorial = [nuevaVenta, ...historial];
     setHistorial(nuevoHistorial);
     localStorage.setItem("ventas_oaxaca", JSON.stringify(nuevoHistorial));
-
-    // Limpiar pantalla
     setCuenta({});
     setTotal(0);
     setMostrarQR(false);
@@ -178,7 +174,10 @@ export default function POSApp() {
               Total: ${total}
             </span>
             <button
-              onClick={() => setCuenta({})}
+              onClick={() => {
+                setCuenta({});
+                setTotal(0);
+              }}
               style={{
                 backgroundColor: "#e74c3c",
                 color: "white",
@@ -214,7 +213,7 @@ export default function POSApp() {
         </div>
       </div>
 
-      {/* MODAL DEL QR Y REGISTRO */}
+      {/* MODAL DEL QR */}
       {mostrarQR && (
         <div
           style={{
@@ -254,11 +253,9 @@ export default function POSApp() {
             >
               <X size={28} color="#95a5a6" />
             </button>
-
             <h2 style={{ color: "#2c3e50", margin: "10px 0" }}>
               Total a Pagar: ${total}.00
             </h2>
-
             <div
               style={{
                 backgroundColor: "white",
@@ -273,7 +270,6 @@ export default function POSApp() {
                 style={{ width: "100%", borderRadius: "5px" }}
               />
             </div>
-
             <div
               style={{
                 marginTop: "15px",
@@ -306,7 +302,6 @@ export default function POSApp() {
                 Sabor a Oaxaca
               </p>
             </div>
-
             <button
               onClick={registrarVenta}
               style={{
@@ -415,7 +410,7 @@ export default function POSApp() {
         ))}
       </div>
 
-      {/* SECCIÓN HISTORIAL AL FINAL */}
+      {/* Historial */}
       <div
         style={{
           padding: "15px",
@@ -442,7 +437,6 @@ export default function POSApp() {
           {verHistorial ? "Ocultar Ventas" : "Ver Ventas del Día"} (
           {historial.length})
         </button>
-
         {verHistorial && (
           <div style={{ marginTop: "15px" }}>
             <div
@@ -468,7 +462,7 @@ export default function POSApp() {
               </button>
             </div>
             {historial.length === 0 ? (
-              <p>No hay ventas registradas hoy.</p>
+              <p>No hay ventas registradas.</p>
             ) : (
               historial.map((v) => (
                 <div
@@ -478,7 +472,6 @@ export default function POSApp() {
                     padding: "10px",
                     borderRadius: "10px",
                     marginBottom: "8px",
-                    fontSize: "14px",
                     borderLeft: "5px solid #27ae60",
                   }}
                 >
@@ -490,16 +483,18 @@ export default function POSApp() {
                     }}
                   >
                     <span>{v.hora}</span>
-                    <span style={{ color: "#27ae60" }}>${v.monto}.00</span>
+                    <span>${v.monto}.00</span>
                   </div>
-                  <div style={{ color: "#7f8c8d" }}>{v.detalle}</div>
+                  <div style={{ color: "#7f8c8d", fontSize: "14px" }}>
+                    {v.detalle}
+                  </div>
                 </div>
               ))
             )}
             <div
               style={{
-                marginTop: "15px",
-                padding: "15px",
+                marginTop: "10px",
+                padding: "10px",
                 backgroundColor: "#1f2937",
                 color: "white",
                 borderRadius: "10px",
