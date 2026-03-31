@@ -215,26 +215,119 @@ export default function POSApp() {
       </div>
 
       {/* MODAL DEL QR Y REGISTRO */}
-<div style={{ backgroundColor: "white", padding: "20px", borderRadius: "20px", width: "100%", maxWidth: "350px", textAlign: "center", position: "relative" }}>
-  <button onClick={() => setMostrarQR(false)} style={{ position: "absolute", top: "10px", right: "10px", border: "none", background: "none" }}><X size={28} color="#95a5a6" /></button>
-  
-  <h2 style={{ color: "#2c3e50", margin: "10px 0" }}>Total a Pagar: ${total}.00</h2>
-  
-  <div style={{ backgroundColor: "white", padding: "10px", borderRadius: "10px", border: "1px solid #eee" }}>
-    <img src="qr-pago.png" alt="QR" style={{ width: "100%", borderRadius: "5px" }} />
-  </div>
+      {mostrarQR && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.85)",
+            zIndex: 2000,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "20px",
+              width: "100%",
+              maxWidth: "350px",
+              textAlign: "center",
+              position: "relative",
+            }}
+          >
+            <button
+              onClick={() => setMostrarQR(false)}
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                border: "none",
+                background: "none",
+              }}
+            >
+              <X size={28} color="#95a5a6" />
+            </button>
 
-  {/* AQUÍ ESTÁ TU DISEÑO DE ANTES */}
-  <div style={{ marginTop: "15px", padding: "10px", backgroundColor: "#f8f9fa", borderRadius: "10px" }}>
-    <p style={{ margin: "0", fontWeight: "bold", fontSize: "16px", color: "#2c3e50" }}>CLABE Banamex</p>
-    <p style={{ margin: "0", fontWeight: "bold", fontSize: "18px", color: "#2c3e50" }}>002 010 9041 0853 8830</p>
-    <p style={{ margin: "0", fontSize: "18px", color: "#2c3e50" }}>Sabor a Oaxaca</p>
-  </div>
+            <h2 style={{ color: "#2c3e50", margin: "10px 0" }}>
+              Total a Pagar: ${total}.00
+            </h2>
 
-  <button onClick={registrarVenta} style={{ marginTop: "15px", width: "100%", backgroundColor: "#27ae60", color: "white", padding: "15px", borderRadius: "12px", border: "none", fontWeight: "bold", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
-    <CheckCircle2 size={24} /> CONFIRMAR Y REGISTRAR
-  </button>
-</div>
+            <div
+              style={{
+                backgroundColor: "white",
+                padding: "10px",
+                borderRadius: "10px",
+                border: "1px solid #eee",
+              }}
+            >
+              <img
+                src="qr-pago.png"
+                alt="QR"
+                style={{ width: "100%", borderRadius: "5px" }}
+              />
+            </div>
+
+            <div
+              style={{
+                marginTop: "15px",
+                padding: "10px",
+                backgroundColor: "#f8f9fa",
+                borderRadius: "10px",
+              }}
+            >
+              <p
+                style={{
+                  margin: "0",
+                  fontWeight: "bold",
+                  fontSize: "16px",
+                  color: "#2c3e50",
+                }}
+              >
+                CLABE Banamex
+              </p>
+              <p
+                style={{
+                  margin: "0",
+                  fontWeight: "bold",
+                  fontSize: "18px",
+                  color: "#2c3e50",
+                }}
+              >
+                002 010 9041 0853 8830
+              </p>
+              <p style={{ margin: "0", fontSize: "18px", color: "#2c3e50" }}>
+                Sabor a Oaxaca
+              </p>
+            </div>
+
+            <button
+              onClick={registrarVenta}
+              style={{
+                marginTop: "15px",
+                width: "100%",
+                backgroundColor: "#27ae60",
+                color: "white",
+                padding: "15px",
+                borderRadius: "12px",
+                border: "none",
+                fontWeight: "bold",
+                fontSize: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+              }}
+            >
+              <CheckCircle2 size={24} /> CONFIRMAR Y REGISTRAR
+            </button>
+          </div>
         </div>
       )}
 
