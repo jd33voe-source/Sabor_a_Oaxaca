@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Beef,
   CupSoda,
@@ -9,6 +9,9 @@ import {
   Minus,
   QrCode,
   X,
+  ClipboardList,
+  Trash2,
+  CheckCircle2,
 } from "lucide-react";
 
 // Iconos personalizados
@@ -56,6 +59,13 @@ export default function POSApp() {
   const [cuenta, setCuenta] = useState({});
   const [total, setTotal] = useState(0);
   const [mostrarQR, setMostrarQR] = useState(false);
+  const [verHistorial, setVerHistorial] = useState(false);
+
+  // Cargar historial desde la memoria del teléfono
+  const [historial, setHistorial] = useState(() => {
+    const guardado = localStorage.getItem("ventas_oaxaca");
+    return guardado ? JSON.parse(guardado) : [];
+  });
 
   const agregarProducto = (producto) => {
     setCuenta((prev) => {
@@ -88,11 +98,33 @@ export default function POSApp() {
     setTotal((prev) => prev - producto.precio);
   };
 
-  const resetCuenta = () => {
-    if (window.confirm("¿Estás seguro de limpiar toda la cuenta?")) {
-      setCuenta({});
-      setTotal(0);
-      setMostrarQR(false);
+  const registrarVenta = () => {
+    const nuevaVenta = {
+      id: Date.now(),
+      hora: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      detalle: Object.entries(cuenta)
+        .map(([nom, data]) => `${data.cantidad}x ${nom}`)
+        .join(", "),
+      monto: total,
+    };
+
+    const nuevoHistorial = [nuevaVenta, ...historial];
+    setHistorial(nuevoHistorial);
+    localStorage.setItem("ventas_oaxaca", JSON.stringify(nuevoHistorial));
+
+    // Limpiar pantalla
+    setCuenta({});
+    setTotal(0);
+    setMostrarQR(false);
+  };
+
+  const limpiarHistorial = () => {
+    if (window.confirm("¿Borrar todas las ventas del día?")) {
+      setHistorial([]);
+      localStorage.removeItem("ventas_oaxaca");
     }
   };
 
@@ -102,7 +134,7 @@ export default function POSApp() {
         minHeight: "100vh",
         backgroundColor: "#f3f4f6",
         fontFamily: "sans-serif",
-        paddingBottom: "20px",
+        paddingBottom: "80px",
       }}
     >
       {/* Header fijo */}
@@ -146,7 +178,7 @@ export default function POSApp() {
               Total: ${total}
             </span>
             <button
-              onClick={resetCuenta}
+              onClick={() => setCuenta({})}
               style={{
                 backgroundColor: "#e74c3c",
                 color: "white",
@@ -175,139 +207,34 @@ export default function POSApp() {
               justifyContent: "center",
               alignItems: "center",
               gap: "10px",
-              cursor: total > 0 ? "pointer" : "default",
             }}
           >
-            <QrCode size={22} /> MOSTRAR QR DE PAGO
+            <QrCode size={22} /> COBRAR (QR)
           </button>
         </div>
       </div>
 
-      {/* MODAL DEL QR (CORREGIDO) */}
-      {mostrarQR && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0,0,0,0.85)",
-            zIndex: 2000,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "20px",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "25px",
-              borderRadius: "20px",
-              width: "100%",
-              maxWidth: "350px",
-              textAlign: "center",
-              position: "relative",
-            }}
-          >
-            <button
-              onClick={() => setMostrarQR(false)}
-              style={{
-                position: "absolute",
-                top: "10px",
-                right: "10px",
-                border: "none",
-                background: "none",
-                cursor: "pointer",
-              }}
-            >
-              <X size={28} color="#95a5a6" />
-            </button>
-            <h2 style={{ color: "#2c3e50", marginBottom: "5px" }}>
-              Escanea para Pagar
-            </h2>
-            <p
-              style={{
-                fontSize: "28px",
-                fontWeight: "bold",
-                color: "#27ae60",
-                marginBottom: "20px",
-              }}
-            >
-              ${total}.00
-            </p>
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "10px",
-                borderRadius: "10px",
-                border: "1px solid #eee",
-              }}
-            >
-              <img
-                src="qr-pago.png"
-                alt="QR Banamex"
-                style={{ width: "100%", height: "auto", borderRadius: "5px" }}
-                onError={(e) =>
-                  (e.target.src =
-                    "https://via.placeholder.com/250?text=Sube+tu+QR+a+public")
-                }
-              />
-            </div>
-            <div
-              style={{
-                marginTop: "15px",
-                padding: "15px",
-                backgroundColor: "#f8f9fa",
-                borderRadius: "12px",
-                border: "1px solid #e9ecef",
-              }}
-            >
-              <p
-                style={{
-                  margin: "0 0 5px 0",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                  color: "#7f8c8d",
-                  textTransform: "uppercase",
-                }}
-              >
-                Datos de Transferencia
-              </p>
-              <p
-                style={{
-                  margin: "0",
-                  fontWeight: "bold",
-                  fontSize: "16px",
-                  color: "#2c3e50",
-                }}
-              >
-                CLABE Banamex
-              </p>
-              <p
-                style={{
-                  margin: "5px 0",
-                  fontSize: "17px",
-                  color: "#2c3e50",
-                  letterSpacing: "1px",
-                  fontWeight: "600",
-                }}
-              >
-                002 010 9041 0853 8830
-              </p>
-              <p
-                style={{
-                  margin: "5px 0 0 0",
-                  fontSize: "18px",
-                  color: "#34495e",
-                  fontStyle: "italic",
-                }}
-              >
-                Sabor a Oaxaca
-              </p>
-            </div>
-          </div>
+      {/* MODAL DEL QR Y REGISTRO */}
+<div style={{ backgroundColor: "white", padding: "20px", borderRadius: "20px", width: "100%", maxWidth: "350px", textAlign: "center", position: "relative" }}>
+  <button onClick={() => setMostrarQR(false)} style={{ position: "absolute", top: "10px", right: "10px", border: "none", background: "none" }}><X size={28} color="#95a5a6" /></button>
+  
+  <h2 style={{ color: "#2c3e50", margin: "10px 0" }}>Total a Pagar: ${total}.00</h2>
+  
+  <div style={{ backgroundColor: "white", padding: "10px", borderRadius: "10px", border: "1px solid #eee" }}>
+    <img src="qr-pago.png" alt="QR" style={{ width: "100%", borderRadius: "5px" }} />
+  </div>
+
+  {/* AQUÍ ESTÁ TU DISEÑO DE ANTES */}
+  <div style={{ marginTop: "15px", padding: "10px", backgroundColor: "#f8f9fa", borderRadius: "10px" }}>
+    <p style={{ margin: "0", fontWeight: "bold", fontSize: "16px", color: "#2c3e50" }}>CLABE Banamex</p>
+    <p style={{ margin: "0", fontWeight: "bold", fontSize: "18px", color: "#2c3e50" }}>002 010 9041 0853 8830</p>
+    <p style={{ margin: "0", fontSize: "18px", color: "#2c3e50" }}>Sabor a Oaxaca</p>
+  </div>
+
+  <button onClick={registrarVenta} style={{ marginTop: "15px", width: "100%", backgroundColor: "#27ae60", color: "white", padding: "15px", borderRadius: "12px", border: "none", fontWeight: "bold", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
+    <CheckCircle2 size={24} /> CONFIRMAR Y REGISTRAR
+  </button>
+</div>
         </div>
       )}
 
@@ -325,16 +252,15 @@ export default function POSApp() {
           >
             <h2
               style={{
-                fontSize: "20px",
+                fontSize: "18px",
                 marginBottom: "12px",
                 color: "#34495e",
-                borderBottom: "1px solid rgba(0,0,0,0.05)",
               }}
             >
               {cat}
             </h2>
             <div
-              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+              style={{ display: "flex", flexDirection: "column", gap: "8px" }}
             >
               {categorias[cat].map((p) => {
                 const Icono = p.icono;
@@ -348,70 +274,33 @@ export default function POSApp() {
                       backgroundColor: "white",
                       borderRadius: "12px",
                       padding: "8px",
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
                     }}
                   >
                     <button
                       onClick={() => quitarProducto(p)}
                       style={{
                         border: "none",
-                        backgroundColor: cantidad > 0 ? "#fff0f0" : "#f8f9fa",
+                        backgroundColor: "#f8f9fa",
                         color: "#e74c3c",
-                        padding: "12px",
-                        borderRadius: "10px",
-                        cursor: "pointer",
+                        padding: "10px",
+                        borderRadius: "8px",
                       }}
                     >
-                      <Minus size={20} strokeWidth={3} />
+                      <Minus size={18} />
                     </button>
                     <div
                       onClick={() => agregarProducto(p)}
-                      style={{
-                        flex: 1,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        padding: "0 12px",
-                        cursor: "pointer",
-                      }}
+                      style={{ flex: 1, padding: "0 10px", cursor: "pointer" }}
                     >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "10px",
-                        }}
-                      >
-                        <Icono size={24} />
-                        <div>
-                          <div style={{ fontWeight: "600", fontSize: "16px" }}>
-                            {p.nombre}
-                          </div>
-                          <div
-                            style={{
-                              color: "#27ae60",
-                              fontSize: "14px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            ${p.precio}
-                          </div>
-                        </div>
+                      <div style={{ fontWeight: "600" }}>
+                        {p.nombre} <Icono size={16} />
                       </div>
-                      {cantidad > 0 && (
-                        <span
-                          style={{
-                            backgroundColor: "#3498db",
-                            color: "white",
-                            padding: "4px 10px",
-                            borderRadius: "20px",
-                            fontWeight: "bold",
-                            fontSize: "14px",
-                          }}
-                        >
-                          {cantidad}
-                        </span>
-                      )}
+                      <div style={{ color: "#27ae60", fontWeight: "bold" }}>
+                        ${p.precio}{" "}
+                        {cantidad > 0 && (
+                          <span style={{ color: "#3498db" }}>x{cantidad}</span>
+                        )}
+                      </div>
                     </div>
                     <button
                       onClick={() => agregarProducto(p)}
@@ -419,12 +308,11 @@ export default function POSApp() {
                         border: "none",
                         backgroundColor: "#f0f7ff",
                         color: "#3498db",
-                        padding: "12px",
-                        borderRadius: "10px",
-                        cursor: "pointer",
+                        padding: "10px",
+                        borderRadius: "8px",
                       }}
                     >
-                      <Plus size={20} strokeWidth={3} />
+                      <Plus size={18} />
                     </button>
                   </div>
                 );
@@ -432,6 +320,106 @@ export default function POSApp() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* SECCIÓN HISTORIAL AL FINAL */}
+      <div
+        style={{
+          padding: "15px",
+          borderTop: "2px solid #ddd",
+          marginTop: "20px",
+        }}
+      >
+        <button
+          onClick={() => setVerHistorial(!verHistorial)}
+          style={{
+            width: "100%",
+            backgroundColor: "#7f8c8d",
+            color: "white",
+            padding: "10px",
+            borderRadius: "10px",
+            border: "none",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          <ClipboardList size={20} />{" "}
+          {verHistorial ? "Ocultar Ventas" : "Ver Ventas del Día"} (
+          {historial.length})
+        </button>
+
+        {verHistorial && (
+          <div style={{ marginTop: "15px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <h3>Ventas Realizadas</h3>
+              <button
+                onClick={limpiarHistorial}
+                style={{
+                  color: "#e74c3c",
+                  background: "none",
+                  border: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px",
+                }}
+              >
+                <Trash2 size={16} /> Borrar todo
+              </button>
+            </div>
+            {historial.length === 0 ? (
+              <p>No hay ventas registradas hoy.</p>
+            ) : (
+              historial.map((v) => (
+                <div
+                  key={v.id}
+                  style={{
+                    backgroundColor: "white",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    marginBottom: "8px",
+                    fontSize: "14px",
+                    borderLeft: "5px solid #27ae60",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    <span>{v.hora}</span>
+                    <span style={{ color: "#27ae60" }}>${v.monto}.00</span>
+                  </div>
+                  <div style={{ color: "#7f8c8d" }}>{v.detalle}</div>
+                </div>
+              ))
+            )}
+            <div
+              style={{
+                marginTop: "15px",
+                padding: "15px",
+                backgroundColor: "#1f2937",
+                color: "white",
+                borderRadius: "10px",
+                textAlign: "right",
+              }}
+            >
+              <strong>
+                Venta Total: ${historial.reduce((sum, v) => sum + v.monto, 0)}
+                .00
+              </strong>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
