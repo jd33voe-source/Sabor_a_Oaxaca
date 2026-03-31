@@ -4,7 +4,7 @@ import {
   CupSoda,
   Coffee,
   GlassWater,
-  CookingPot,
+  Soup,
   Plus,
   Minus,
   QrCode,
@@ -22,16 +22,16 @@ const PanIcon = ({ size = 22 }) => (
 const categorias = {
   Tacos: [
     { nombre: "Cecina", precio: 30, icono: TacoIcon },
-    { nombre: "Aguja de Res", precio: 30, icono: Beef }, // Aquí usas Beef de Lucide
+    { nombre: "Aguja de Res", precio: 30, icono: Beef },
     { nombre: "Campechano", precio: 30, icono: TacoIcon },
     { nombre: "Guisado", precio: 27, icono: TacoIcon },
     { nombre: "Pechuga de Pollo", precio: 27, icono: TacoIcon },
     { nombre: "Longaniza", precio: 27, icono: TacoIcon },
-    { nombre: "Bistek", precio: 27, icono: TacoIcon }, // CORREGIDO: BeefTacoIcon no existía
+    { nombre: "Bistek", precio: 27, icono: Beef },
   ],
   Comida: [
-    { nombre: "Guisado en plato", precio: 65, icono: CookingPot },
-    { nombre: "Caldo", precio: 90, icono: CookingPot },
+    { nombre: "Guisado en plato", precio: 65, icono: Soup },
+    { nombre: "Caldo", precio: 90, icono: Soup },
   ],
   Bebidas: [
     { nombre: "Refresco", precio: 27, icono: CupSoda },
